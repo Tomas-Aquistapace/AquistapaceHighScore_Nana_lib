@@ -25,7 +25,7 @@ x86/
 [Aa][Rr][Mm]64/
 bld/
 [Bb]in/
-!UsoLibreriaNana/lib
+!UsoLibreriaNana/lib/nana_1.6.0_x86_msvc2015/[Bb]in
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
