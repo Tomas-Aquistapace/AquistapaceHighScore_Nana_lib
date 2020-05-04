@@ -1,86 +1,86 @@
-/*#include <nana/gui.hpp>
-#include <nana/gui/widgets/label.hpp>
-#include <nana/gui/widgets/button.hpp>
-
-int main()
-{
-	using namespace nana;
-
-	//Define a form.
-	form fm;
-
-	//Define a label and display a text.
-	label lab{ fm, "Hello, <bold blue size=16>Nana C++ Library</>" };
-	lab.format(true);
-
-	//Define a button and answer the click event.
-	button btn{ fm, "Quit" };
-	btn.events().click([&fm] 
-	{
-		fm.close();
-	});
-
-	//Layout management
-	fm.div("vert <><<><weight=80% text><>><><weight=24<><button><>><>");
-	fm["text"] << lab;
-	fm["button"] << btn;
-	fm.collocate();
-
-	//Show the form
-	fm.show();
-
-	//Start to event loop process, it blocks until the form is closed.
-	exec();
-}*/
-
-// ---------------------------------------------------------------------
-
 #include <nana/gui.hpp>
 #include <nana/gui/widgets/label.hpp>
 #include <nana/gui/widgets/button.hpp>
 
+//#include <ScoreControl.h>
+#include <Score.h>
+
+using namespace std;
+using namespace nana;
+using namespace API;
+
 int main()
 {
-	using namespace nana;
+	const int max = 10;
 
-	form fm;
-	fm.caption("Calculator");
+	//Define a form.
+	form window(make_center(400, 500), appearance());
+	window.caption(L"High Score - Nana");
 
-	fm.div("vert<proc weight=10%><result weight=15%>"
-		"<weight=2>"
-		"<keys margin=2 grid=[4, 5] gap=2 collapse(0,4,2,1)>");
+	//Define the HighScore library
+	HighScore* scores[max];
 
-	label procedure(fm, "(1 + 7) X 9 +"), result(fm, "72");
+	scores[0] = new HighScore("TOM", 100);
+	scores[1] = new HighScore("FRA", 90);
+	scores[2] = new HighScore("MIG", 80);
+	scores[3] = new HighScore("JOS", 70);
+	scores[4] = new HighScore("MAT", 60);
+	scores[5] = new HighScore("FER", 50);
+	scores[6] = new HighScore("SEB", 40);
+	scores[7] = new HighScore("HEC", 30);
+	scores[8] = new HighScore("AIL", 20);
+	scores[9] = new HighScore("MIC", 10);
 
-	//Make the label right aligned.
-	procedure.text_align(align::right);
-	result.text_align(align::right);
-	result.typeface(paint::font("", 14, true));
-
-	fm["proc"] << procedure;
-	fm["result"] << result;
-
-	std::vector<std::unique_ptr<button>> keys;
-
-	paint::font keyfont("", 10, true);
-
-	wchar_t keys_char[] = L"C\261%/789X456-123+0.=";
-	for (auto kchar : keys_char)
-	{
-		keys.emplace_back(std::make_unique<button>(fm,
-			to_utf8(std::wstring(1, kchar))));	//C++14
-		auto& key = *keys.back();
-		key.typeface(keyfont);
-
-		if ('=' == kchar)
-		{
-			key.bgcolor(color_rgb(0x7ACC));
-			key.fgcolor(colors::white);
-		}
-		fm["keys"] << key;
+	//Define a label and display a text.
+	label* players[max];
+	
+	for (int i = 0; i < max; i++) {
+		players[i] = NULL;
+	}
+	
+	int yPos = 50;
+	
+	for (int i = 0; i < max; i++) {
+		players[i] = new label(window, rectangle(20, yPos, 150, 30));
+		players[i]->format(true);
+		yPos += 40;
 	}
 
-	fm.collocate();
-	fm.show();
+	label tittle(window, rectangle(125, 10, 200, 35));
+	tittle.format(true);
+	tittle.caption("<bold blue size=18> High Scores </>");
+
+	//Draw labels
+	for (int i = 0; i < max; i++)
+	{
+		if (i == 9) {
+			players[i]->caption("<bold=true size=12>" + to_string(i + 1) + " -  " + scores[i]->getName() + "  -  " + to_string(static_cast<int>(scores[i]->getSco())) + "</>");
+		}
+		else{
+			players[i]->caption("<bold=true size=12>" + to_string(i + 1) + "   -  " + scores[i]->getName() + "  -  " + to_string(static_cast<int>(scores[i]->getSco())) + "</>");
+		}
+	}
+
+	//Define a button and answer the click event.
+	button btn(window, rectangle{ 100, 450, 200, 40 });
+	btn.caption(L"Quit");
+	btn.events().click(API::exit);
+
+	//Show the form
+	window.show();
+
+	//Start to event loop process, it blocks until the form is closed.
 	exec();
+
+	//delete scores;
+	for (int i = 0; i < max; i++) {
+		if (scores[i] != NULL)
+			delete scores[i];
+	}
+	for (int i = 0; i < max; i++) {
+		if (players[i] != NULL)
+			delete players[i];
+	}
+
+	return 0;
 }
